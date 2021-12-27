@@ -41,10 +41,10 @@ router.post("/signup", async function (req, res) {
     .findOne({ email: enteredEmail });
 
   if (existingUser) {
-    console.log('User exists already');
-    return res.redirect('/signup');
+    console.log("User exists already");
+    return res.redirect("/signup");
   }
-  
+
   const hashedPassword = await bcrypt.hash(enteredPassword, 12);
 
   const user = {
@@ -82,8 +82,11 @@ router.post("/login", async function (req, res) {
     return res.redirect("/login");
   }
 
-  console.log("User is authenticated!");
-  res.redirect("/admin");
+  req.session.user = { id: existingUser._id, email: existingUser.email };
+  req.session.isAuthenticated = true;
+  req.session.save(function() {
+    res.redirect("/admin");
+  });
 });
 
 router.get("/admin", function (req, res) {
